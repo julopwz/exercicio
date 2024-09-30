@@ -38,3 +38,8 @@ class User(db.Model):
         __tablename__ = "follow"
 
         id = db.Column(db.Integer)
+        user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+        follower_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+        user = db.relationship('User', foreign_keys=user_id)
+        follower = db.relationship('User', foreign_keys=follower_id)
