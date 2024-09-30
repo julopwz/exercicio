@@ -1,4 +1,5 @@
 from app import db
+from app import manager
 
 class User(db.Model):
     __tablename__ = "users"
@@ -15,31 +16,48 @@ class User(db.Model):
         self.name = name
         self.email = email
 
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
+
     def __repr__(self):
-        return "<Use %r>" % self.username
-    
-    class Post(db.Model):
-        __tablename__ = "posts"
+        return "<User %r>" % self.username
 
-        id = db.Column(db.Integer, primary_key=True)
-        content = db.Column(db.Text)
-        id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-        user = db.relationship('User', foreign_keys=user_id)
+class Post(db.Model):
+    __tablename__ = "posts"
 
-        def __init__(self, content, user_id):
-            self.content = content
-            self.user_id = user_id
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-        def __repr__(self):
-            return "<Post %r>" % self.id
-        
-    class Follow(db.Model):
-        __tablename__ = "follow"
+    user = db.relationship('User', foreign_keys=user_id)
 
-        id = db.Column(db.Integer)
-        user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-        follower_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    def __init__(self, content, user_id):
+        self.content = content
+        self.user_id = user_id
 
-        user = db.relationship('User', foreign_keys=user_id)
-        follower = db.relationship('User', foreign_keys=follower_id)
+    def __repr__(self):
+        return "<Post %r>" % self.id
+
+
+class Follow(db.Model):
+    __tablename__ = "follow"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    user = db.relationship('User', foreign_keys=user_id)
+    follower = db.relationship('User', foreign_keys=follower_id)
